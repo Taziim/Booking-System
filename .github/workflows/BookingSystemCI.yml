@@ -1,0 +1,119 @@
+name: Booking System CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  # ==========================================
+  # FRONTEND CI
+  # ==========================================
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # 3. Install dependencies
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # 4. Build frontend
+      - name: Build frontend
+        run: npm run build
+
+      # 5. Trivy security scan
+      - name: Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: frontend
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      # 6. Upload build artifact
+      - name: Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist/
+
+      # 7. Report failure
+      - name: Report frontend failure
+        if: failure()
+        run: echo "❌ Frontend CI failed."
+
+
+  # ==========================================
+  # BACKEND CI
+  # ==========================================
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      # 3. Install dependencies
+      - name: Install backend dependencies
+        run: npm ci
+
+      # 4. Run tests
+      - name: Run backend tests
+        run: npm test --if-present
+
+      # 5. Trivy security scan
+      - name: Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: backend
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      # 6. Report failure
+      - name: Report backend failure
+        if: failure()
+        run: echo "❌ Backend CI failed."

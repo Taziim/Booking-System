@@ -1,0 +1,22 @@
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mindex e69de29..ade357e 100644[m
+[1m--- a/.gitignore[m
+[1m+++ b/.gitignore[m
+[36m@@ -0,0 +1,4 @@[m
+[32m+[m[32m# Environment files[m
+[32m+[m[32m.env[m
+[32m+[m[32m.env.*[m
+[32m+[m[32m!.env.example[m
+\ No newline at end of file[m
+[1mdiff --git a/frontend/.gitignore b/frontend/.gitignore[m
+[1mindex a547bf3..f8338f6 100644[m
+[1m--- a/frontend/.gitignore[m
+[1m+++ b/frontend/.gitignore[m
+[36m@@ -7,6 +7,7 @@[m [myarn-error.log*[m
+ pnpm-debug.log*[m
+ lerna-debug.log*[m
+ [m
+[32m+[m[32mfrontend\.env[m
+ node_modules[m
+ dist[m
+ dist-ssr[m
